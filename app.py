@@ -6,13 +6,17 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
 from typing import Optional
 from datetime import date, time
+import os
 from models import Base, User, Caregiver, Member, Address, Job, JobApplication, Appointment
 from models import GenderEnum, CaregivingTypeEnum, AppointmentStatusEnum
 
-DATABASE_URL = "mysql+mysqlconnector://root@localhost/caregivers_platform"
+DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:postgres@localhost/caregivers_platform")
 
 engine = create_engine(DATABASE_URL, echo=True)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+# Create tables if they don't exist (for first deployment)
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Caregivers Platform")
 
