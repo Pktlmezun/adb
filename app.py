@@ -17,11 +17,16 @@ if DATABASE_URL.startswith("postgres://"):
 elif DATABASE_URL.startswith("postgresql://"):
     DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+psycopg://", 1)
 
-engine = create_engine(DATABASE_URL, echo=True)
+engine = create_engine(DATABASE_URL, echo=True, pool_pre_ping=True)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 # Create tables if they don't exist (for first deployment)
-Base.metadata.create_all(bind=engine)
+# Wrap in try-except to handle initial connection issues
+try:
+    Base.metadata.create_all(bind=engine)
+except Exception as e:
+    print(f"Warning: Could not create tables on startup: {e}")
+    print("Tables will be created on first database access")
 
 app = FastAPI(title="Caregivers Platform")
 
