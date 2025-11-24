@@ -11,6 +11,11 @@ from models import Base, User, Caregiver, Member, Address, Job, JobApplication, 
 from models import GenderEnum, CaregivingTypeEnum, AppointmentStatusEnum
 
 DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:postgres@localhost/caregivers_platform")
+# Fix for psycopg (v3) - replace postgresql:// with postgresql+psycopg://
+if DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql+psycopg://", 1)
+elif DATABASE_URL.startswith("postgresql://"):
+    DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+psycopg://", 1)
 
 engine = create_engine(DATABASE_URL, echo=True)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
