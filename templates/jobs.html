@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}Jobs - Caregivers Platform{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Jobs Management</h2>
+
+    <div class="form-section">
+        <h3>Create New Job</h3>
+        <form method="post" action="/jobs/create">
+            <select name="member_user_id" required>
+                <option value="">Select Member</option>
+                {% for member in members %}
+                <option value="{{ member.member_user_id }}">{{ member.user.given_name }} {{ member.user.surname }} (ID: {{ member.member_user_id }})</option>
+                {% endfor %}
+            </select>
+            <select name="required_caregiving_type" required>
+                <option value="">Select Caregiving Type</option>
+                {% for type in caregiving_types %}
+                <option value="{{ type }}">{{ type }}</option>
+                {% endfor %}
+            </select>
+            <textarea name="other_requirements" placeholder="Other Requirements"></textarea>
+            <input type="date" name="date_posted" required>
+            <button type="submit" class="btn">Create Job</button>
+        </form>
+    </div>
+
+    <div class="table-section">
+        <h3>All Jobs</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Job ID</th>
+                    <th>Member</th>
+                    <th>Caregiving Type</th>
+                    <th>Requirements</th>
+                    <th>Date Posted</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for job in jobs %}
+                <tr>
+                    <td>{{ job.job_id }}</td>
+                    <td>{{ job.member.user.given_name }} {{ job.member.user.surname }}</td>
+                    <td>{{ job.required_caregiving_type }}</td>
+                    <td>{{ job.other_requirements[:50] }}...</td>
+                    <td>{{ job.date_posted }}</td>
+                    <td>
+                        <button onclick="editJob({{ job.job_id }}, {{ job.member_user_id }}, '{{ job.required_caregiving_type }}', '{{ job.other_requirements }}', '{{ job.date_posted }}')" class="btn-small">Edit</button>
+                        <form method="post" action="/jobs/delete/{{ job.job_id }}" style="display:inline;">
+                            <button type="submit" class="btn-small btn-danger" onclick="return confirm('Delete this job?')">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h3>Edit Job</h3>
+            <form id="editForm" method="post">
+                <select id="edit_member_user_id" name="member_user_id" required>
+                    {% for member in members %}
+                    <option value="{{ member.member_user_id }}">{{ member.user.given_name }} {{ member.user.surname }}</option>
+                    {% endfor %}
+                </select>
+                <select id="edit_required_caregiving_type" name="required_caregiving_type" required>
+                    {% for type in caregiving_types %}
+                    <option value="{{ type }}">{{ type }}</option>
+                    {% endfor %}
+                </select>
+                <textarea id="edit_other_requirements" name="other_requirements" placeholder="Other Requirements"></textarea>
+                <input type="date" id="edit_date_posted" name="date_posted" required>
+                <button type="submit" class="btn">Update Job</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function editJob(id, member_id, type, requirements, date) {
+    document.getElementById('editForm').action = '/jobs/update/' + id;
+    document.getElementById('edit_member_user_id').value = member_id;
+    document.getElementById('edit_required_caregiving_type').value = type;
+    document.getElementById('edit_other_requirements').value = requirements;
+    document.getElementById('edit_date_posted').value = date;
+    document.getElementById('editModal').style.display = 'block';
+}
+
+function closeModal() {
+    document.getElementById('editModal').style.display = 'none';
+}
+</script>
+{% endblock %}

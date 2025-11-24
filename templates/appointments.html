@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block title %}Appointments - Caregivers Platform{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Appointments Management</h2>
+
+    <div class="form-section">
+        <h3>Create New Appointment</h3>
+        <form method="post" action="/appointments/create">
+            <select name="caregiver_user_id" required>
+                <option value="">Select Caregiver</option>
+                {% for caregiver in caregivers %}
+                <option value="{{ caregiver.caregiver_user_id }}">{{ caregiver.user.given_name }} {{ caregiver.user.surname }} (ID: {{ caregiver.caregiver_user_id }})</option>
+                {% endfor %}
+            </select>
+            <select name="member_user_id" required>
+                <option value="">Select Member</option>
+                {% for member in members %}
+                <option value="{{ member.member_user_id }}">{{ member.user.given_name }} {{ member.user.surname }} (ID: {{ member.member_user_id }})</option>
+                {% endfor %}
+            </select>
+            <input type="date" name="appointment_date" required>
+            <input type="time" name="appointment_time" required>
+            <input type="number" name="work_hours" placeholder="Work Hours" required>
+            <select name="status" required>
+                <option value="">Select Status</option>
+                {% for status in statuses %}
+                <option value="{{ status }}">{{ status }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn">Create Appointment</button>
+        </form>
+    </div>
+
+    <div class="table-section">
+        <h3>All Appointments</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Caregiver</th>
+                    <th>Member</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Hours</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for apt in appointments %}
+                <tr>
+                    <td>{{ apt.appointment_id }}</td>
+                    <td>{{ apt.caregiver.user.given_name }} {{ apt.caregiver.user.surname }}</td>
+                    <td>{{ apt.member.user.given_name }} {{ apt.member.user.surname }}</td>
+                    <td>{{ apt.appointment_date }}</td>
+                    <td>{{ apt.appointment_time }}</td>
+                    <td>{{ apt.work_hours }}</td>
+                    <td>{{ apt.status }}</td>
+                    <td>
+                        <button onclick="editAppointment({{ apt.appointment_id }}, {{ apt.caregiver_user_id }}, {{ apt.member_user_id }}, '{{ apt.appointment_date }}', '{{ apt.appointment_time }}', {{ apt.work_hours }}, '{{ apt.status }}')" class="btn-small">Edit</button>
+                        <form method="post" action="/appointments/delete/{{ apt.appointment_id }}" style="display:inline;">
+                            <button type="submit" class="btn-small btn-danger" onclick="return confirm('Delete this appointment?')">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h3>Edit Appointment</h3>
+            <form id="editForm" method="post">
+                <select id="edit_caregiver_user_id" name="caregiver_user_id" required>
+                    {% for caregiver in caregivers %}
+                    <option value="{{ caregiver.caregiver_user_id }}">{{ caregiver.user.given_name }} {{ caregiver.user.surname }}</option>
+                    {% endfor %}
+                </select>
+                <select id="edit_member_user_id" name="member_user_id" required>
+                    {% for member in members %}
+                    <option value="{{ member.member_user_id }}">{{ member.user.given_name }} {{ member.user.surname }}</option>
+                    {% endfor %}
+                </select>
+                <input type="date" id="edit_appointment_date" name="appointment_date" required>
+                <input type="time" id="edit_appointment_time" name="appointment_time" required>
+                <input type="number" id="edit_work_hours" name="work_hours" required>
+                <select id="edit_status" name="status" required>
+                    {% for status in statuses %}
+                    <option value="{{ status }}">{{ status }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="btn">Update Appointment</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function editAppointment(id, caregiver_id, member_id, date, time, hours, status) {
+    document.getElementById('editForm').action = '/appointments/update/' + id;
+    document.getElementById('edit_caregiver_user_id').value = caregiver_id;
+    document.getElementById('edit_member_user_id').value = member_id;
+    document.getElementById('edit_appointment_date').value = date;
+    document.getElementById('edit_appointment_time').value = time;
+    document.getElementById('edit_work_hours').value = hours;
+    document.getElementById('edit_status').value = status;
+    document.getElementById('editModal').style.display = 'block';
+}
+
+function closeModal() {
+    document.getElementById('editModal').style.display = 'none';
+}
+</script>
+{% endblock %}

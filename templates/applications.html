@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}Applications - Caregivers Platform{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Job Applications Management</h2>
+
+    <div class="form-section">
+        <h3>Create New Application</h3>
+        <form method="post" action="/applications/create">
+            <select name="caregiver_user_id" required>
+                <option value="">Select Caregiver</option>
+                {% for caregiver in caregivers %}
+                <option value="{{ caregiver.caregiver_user_id }}">{{ caregiver.user.given_name }} {{ caregiver.user.surname }} (ID: {{ caregiver.caregiver_user_id }})</option>
+                {% endfor %}
+            </select>
+            <select name="job_id" required>
+                <option value="">Select Job</option>
+                {% for job in jobs %}
+                <option value="{{ job.job_id }}">Job #{{ job.job_id }} - {{ job.required_caregiving_type.value }}</option>
+                {% endfor %}
+            </select>
+            <input type="date" name="date_applied" required>
+            <button type="submit" class="btn">Create Application</button>
+        </form>
+    </div>
+
+    <div class="table-section">
+        <h3>All Applications</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Caregiver ID</th>
+                    <th>Caregiver Name</th>
+                    <th>Job ID</th>
+                    <th>Job Type</th>
+                    <th>Date Applied</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for app in applications %}
+                <tr>
+                    <td>{{ app.caregiver_user_id }}</td>
+                    <td>{{ app.caregiver.user.given_name }} {{ app.caregiver.user.surname }}</td>
+                    <td>{{ app.job_id }}</td>
+                    <td>{{ app.job.required_caregiving_type }}</td>
+                    <td>{{ app.date_applied }}</td>
+                    <td>
+                        <button onclick="editApplication({{ app.caregiver_user_id }}, {{ app.job_id }}, '{{ app.date_applied }}')" class="btn-small">Edit</button>
+                        <form method="post" action="/applications/delete/{{ app.caregiver_user_id }}/{{ app.job_id }}" style="display:inline;">
+                            <button type="submit" class="btn-small btn-danger" onclick="return confirm('Delete this application?')">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h3>Edit Application</h3>
+            <form id="editForm" method="post">
+                <input type="date" id="edit_date_applied" name="date_applied" required>
+                <button type="submit" class="btn">Update Application</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function editApplication(caregiver_id, job_id, date) {
+    document.getElementById('editForm').action = '/applications/update/' + caregiver_id + '/' + job_id;
+    document.getElementById('edit_date_applied').value = date;
+    document.getElementById('editModal').style.display = 'block';
+}
+
+function closeModal() {
+    document.getElementById('editModal').style.display = 'none';
+}
+</script>
+{% endblock %}

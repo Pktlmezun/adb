@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}Caregivers - Caregivers Platform{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Caregivers Management</h2>
+
+    <div class="form-section">
+        <h3>Create New Caregiver</h3>
+        <form method="post" action="/caregivers/create">
+            <select name="caregiver_user_id" required>
+                <option value="">Select User</option>
+                {% for user in available_users %}
+                <option value="{{ user.user_id }}">{{ user.given_name }} {{ user.surname }} (ID: {{ user.user_id }})</option>
+                {% endfor %}
+            </select>
+            <input type="text" name="photo" placeholder="Photo URL">
+            <select name="gender" required>
+                <option value="">Select Gender</option>
+                {% for gender in genders %}
+                <option value="{{ gender }}">{{ gender }}</option>
+                {% endfor %}
+            </select>
+            <select name="caregiving_type" required>
+                <option value="">Select Caregiving Type</option>
+                {% for type in caregiving_types %}
+                <option value="{{ type }}">{{ type }}</option>
+                {% endfor %}
+            </select>
+            <input type="number" step="0.01" name="hourly_rate" placeholder="Hourly Rate" required>
+            <button type="submit" class="btn">Create Caregiver</button>
+        </form>
+    </div>
+
+    <div class="table-section">
+        <h3>All Caregivers</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>User ID</th>
+                    <th>Name</th>
+                    <th>Gender</th>
+                    <th>Type</th>
+                    <th>Hourly Rate</th>
+                    <th>Photo</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for caregiver in caregivers %}
+                <tr>
+                    <td>{{ caregiver.caregiver_user_id }}</td>
+                    <td>{{ caregiver.user.given_name }} {{ caregiver.user.surname }}</td>
+                    <td>{{ caregiver.gender }}</td>
+                    <td>{{ caregiver.caregiving_type }}</td>
+                    <td>${{ caregiver.hourly_rate }}</td>
+                    <td>{{ caregiver.photo }}</td>
+                    <td>
+                        <button onclick="editCaregiver({{ caregiver.caregiver_user_id }}, '{{ caregiver.photo }}', '{{ caregiver.gender }}', '{{ caregiver.caregiving_type }}', {{ caregiver.hourly_rate }})" class="btn-small">Edit</button>
+                        <form method="post" action="/caregivers/delete/{{ caregiver.caregiver_user_id }}" style="display:inline;">
+                            <button type="submit" class="btn-small btn-danger" onclick="return confirm('Delete this caregiver?')">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h3>Edit Caregiver</h3>
+            <form id="editForm" method="post">
+                <input type="text" id="edit_photo" name="photo" placeholder="Photo URL">
+                <select id="edit_gender" name="gender" required>
+                    {% for gender in genders %}
+                    <option value="{{ gender }}">{{ gender }}</option>
+                    {% endfor %}
+                </select>
+                <select id="edit_caregiving_type" name="caregiving_type" required>
+                    {% for type in caregiving_types %}
+                    <option value="{{ type }}">{{ type }}</option>
+                    {% endfor %}
+                </select>
+                <input type="number" step="0.01" id="edit_hourly_rate" name="hourly_rate" required>
+                <button type="submit" class="btn">Update Caregiver</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function editCaregiver(id, photo, gender, type, rate) {
+    document.getElementById('editForm').action = '/caregivers/update/' + id;
+    document.getElementById('edit_photo').value = photo;
+    document.getElementById('edit_gender').value = gender;
+    document.getElementById('edit_caregiving_type').value = type;
+    document.getElementById('edit_hourly_rate').value = rate;
+    document.getElementById('editModal').style.display = 'block';
+}
+
+function closeModal() {
+    document.getElementById('editModal').style.display = 'none';
+}
+</script>
+{% endblock %}

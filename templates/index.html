@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Caregivers Platform{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Welcome to Caregivers Platform</h2>
+    <p>This is a database management system for caregivers and families seeking care services.</p>
+
+    <div class="cards">
+        <div class="card">
+            <h3>Users</h3>
+            <p>Manage all user accounts in the system.</p>
+            <a href="/users" class="btn">View Users</a>
+        </div>
+
+        <div class="card">
+            <h3>Caregivers</h3>
+            <p>Browse and manage caregiver profiles.</p>
+            <a href="/caregivers" class="btn">View Caregivers</a>
+        </div>
+
+        <div class="card">
+            <h3>Members</h3>
+            <p>Manage family member accounts.</p>
+            <a href="/members" class="btn">View Members</a>
+        </div>
+
+        <div class="card">
+            <h3>Addresses</h3>
+            <p>View and update member addresses.</p>
+            <a href="/addresses" class="btn">View Addresses</a>
+        </div>
+
+        <div class="card">
+            <h3>Jobs</h3>
+            <p>Manage job postings and opportunities.</p>
+            <a href="/jobs" class="btn">View Jobs</a>
+        </div>
+
+        <div class="card">
+            <h3>Applications</h3>
+            <p>Track job applications from caregivers.</p>
+            <a href="/applications" class="btn">View Applications</a>
+        </div>
+
+        <div class="card">
+            <h3>Appointments</h3>
+            <p>Schedule and manage appointments.</p>
+            <a href="/appointments" class="btn">View Appointments</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

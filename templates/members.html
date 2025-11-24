@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}Members - Caregivers Platform{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Members Management</h2>
+
+    <div class="form-section">
+        <h3>Create New Member</h3>
+        <form method="post" action="/members/create">
+            <select name="member_user_id" required>
+                <option value="">Select User</option>
+                {% for user in available_users %}
+                <option value="{{ user.user_id }}">{{ user.given_name }} {{ user.surname }} (ID: {{ user.user_id }})</option>
+                {% endfor %}
+            </select>
+            <textarea name="house_rules" placeholder="House Rules"></textarea>
+            <textarea name="dependent_description" placeholder="Dependent Description"></textarea>
+            <button type="submit" class="btn">Create Member</button>
+        </form>
+    </div>
+
+    <div class="table-section">
+        <h3>All Members</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>User ID</th>
+                    <th>Name</th>
+                    <th>House Rules</th>
+                    <th>Dependent Description</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for member in members %}
+                <tr>
+                    <td>{{ member.member_user_id }}</td>
+                    <td>{{ member.user.given_name }} {{ member.user.surname }}</td>
+                    <td>{{ member.house_rules[:50] }}...</td>
+                    <td>{{ member.dependent_description[:50] }}...</td>
+                    <td>
+                        <button onclick="editMember({{ member.member_user_id }}, '{{ member.house_rules }}', '{{ member.dependent_description }}')" class="btn-small">Edit</button>
+                        <form method="post" action="/members/delete/{{ member.member_user_id }}" style="display:inline;">
+                            <button type="submit" class="btn-small btn-danger" onclick="return confirm('Delete this member?')">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h3>Edit Member</h3>
+            <form id="editForm" method="post">
+                <textarea id="edit_house_rules" name="house_rules" placeholder="House Rules"></textarea>
+                <textarea id="edit_dependent_description" name="dependent_description" placeholder="Dependent Description"></textarea>
+                <button type="submit" class="btn">Update Member</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function editMember(id, rules, desc) {
+    document.getElementById('editForm').action = '/members/update/' + id;
+    document.getElementById('edit_house_rules').value = rules;
+    document.getElementById('edit_dependent_description').value = desc;
+    document.getElementById('editModal').style.display = 'block';
+}
+
+function closeModal() {
+    document.getElementById('editModal').style.display = 'none';
+}
+</script>
+{% endblock %}
